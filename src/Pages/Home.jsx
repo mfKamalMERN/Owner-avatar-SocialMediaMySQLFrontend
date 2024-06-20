@@ -57,7 +57,7 @@ export const Home = () => {
         tokenCHecker()
     }, [cmnt, posts, showcomments, editstatus, status, likes, targetpostlikes])
 
-    
+
 
 
     const ViewComments = async (postId, statuss) => {
@@ -223,7 +223,7 @@ export const Home = () => {
             <br />
             <br />
 
-            <div className="display" style={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", alignItems: "center", marginTop:"8%" }}>
+            <div className="display" style={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", alignItems: "center", marginTop: "8%" }}>
 
                 {
                     posts.map((post) => (
@@ -288,7 +288,7 @@ export const Home = () => {
                                 {post.id === pid && showcomments ?
 
                                     cmnt.map((comt) => (
-                                        <div className="sinflecomment" style={{ display: "flex", justifyContent: "space-between", marginBottom: "10%", border: "1px solid wheat", backgroundColor: "darkred" }}>
+                                        <div className="sinflecomment" style={{ display: "flex", justifyContent: "space-between", marginBottom: "5%", border: "1px solid wheat", backgroundColor: "darkred", borderRadius: "15px" }}>
 
                                             {
                                                 editstatus && comt.CommentId == cid ?
@@ -337,16 +337,16 @@ export const Home = () => {
 
                             </div>
 
-                            <div className="viewlikes" style={{ minWidth: "75%" }}>
+                            <div className="viewlikes" style={{ minWidth: "75%", borderRadius: "20px" }}>
                                 {
                                     likesstatus && likedpostid == post.id ?
                                         targetpostlikes.map((v) => (
 
-                                            <div className="likedusers" style={{ display: "flex", justifyContent: "space-between", border: "1px solid wheat", backgroundColor: "brown", width: "100%", alignItems: "center" }}>
+                                            <div className="likedusers" style={{ display: "flex", justifyContent: "space-between", border: "1px solid wheat", backgroundColor: "brown", width: "100%", alignItems: "center", borderRadius: "20px", marginBottom: "5%" }}>
 
-                                                <div className="imgandcmnt" style={{ display: "flex" }}>
+                                                <div className="imgandcmnt" style={{ display: "flex", alignItems: 'center' }}>
 
-                                                    <img src={v.ProfilePic} alt="" style={{ width: "11%", height: "75%", borderRadius: "60%", marginLeft: "5%" }} />
+                                                    <img src={v.ProfilePic} alt="" style={{ width: "85%", height: "45px", borderRadius: "60%", marginLeft: "5%" }} />
                                                     <p style={{ marginLeft: "3%" }}>{v.name}</p>
 
                                                 </div>
@@ -355,13 +355,13 @@ export const Home = () => {
 
                                                     {
                                                         (v.userId == localStorage.getItem('Id')) ?
-                                                            <p style={{ marginTop: "3.5%", marginRight: "13%" }}>It's You</p>
+                                                            <p style={{ marginRight: "13%" }}>It's You😃</p>
                                                             :
                                                             followings.find(f => f.UserId == v.userId) || followings.find(fvv => fvv.UserId == v.followinguserid) && v.followeruserid == localStorage.getItem('Id') ?
 
-                                                                <button onClick={() => FollowUnfollow(v.userId)} style={{ height: "65%", backgroundColor: "darkred", color: "wheat", marginRight: "40%" }}>UnFollow</button>
+                                                                <button onClick={() => FollowUnfollow(v.userId)} style={{ height: "70%", backgroundColor: "darkred", color: "wheat", marginRight: "50%", borderRadius: "10px" }}>UnFollow</button>
                                                                 :
-                                                                <button onClick={() => FollowUnfollow(v.userId)} style={{ height: "55%", backgroundColor: "darkgreen", color: "wheat", marginRight: "40%" }}>Follow</button>
+                                                                <button onClick={() => FollowUnfollow(v.userId)} style={{ height: "70%", backgroundColor: "darkgreen", color: "wheat", marginRight: "50%", borderRadius: "10px" }}>Follow</button>
                                                     }
 
                                                 </div>

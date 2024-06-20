@@ -21,11 +21,9 @@ export const Navbarr = () => {
 
     return (
 
-        <div className="Navbar" style={{ border: "1px solid wheat", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "black", color: "wheat" }}>
+        <div className="Navbar" style={{ border: "1px solid wheat", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "brown", color: "wheat" }}>
 
-            <button style={{ marginLeft: "7%" }} onClick={Logout} >Log Out</button>
-
-
+            <button style={{ marginLeft: "7%", color: "wheat", backgroundColor: "darkred", width: "5%", height: "4vh", borderRadius: "15px" }} onClick={Logout} >Log Out</button>
 
             <h1 onClick={() => nav('/home')} style={{ color: "wheat", textAlign: "center", display: "flex", marginLeft: "30%" }}>Social Media🏠</h1>
 

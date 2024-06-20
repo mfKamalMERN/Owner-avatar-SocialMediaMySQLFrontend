@@ -14,6 +14,8 @@ export const MyProfile = () => {
     const [followerstatus, setFollowerstatus] = useState(false)
     const [dpupdatestatus, setDpupdatestatus] = useState(false)
     const [file, setFile] = useState(null)
+    const [citystatus, setCitystatus] = useState(false)
+    const [newcity, setNewcity] = useState("")
 
 
     axios.defaults.withCredentials = true
@@ -35,7 +37,7 @@ export const MyProfile = () => {
 
     useEffect(() => {
         tokenChecker()
-    }, [followers, followings, loggeduser])
+    }, [followers, followings, loggeduser, newcity])
 
     // const HOC = ({ nbar }) => nbar()  //Higher Order Component
 
@@ -81,6 +83,23 @@ export const MyProfile = () => {
                 })
                 .catch(er => console.log(er))
 
+        }
+    }
+
+    const citystatusupdater = () => {
+        setCitystatus(!citystatus)
+        setNewcity(loggeduser[0].city)
+    }
+
+    const UpdateCity = () => {
+        if (newcity.trim() === "") toast("Please fill the updated city")
+        else {
+            axios.put(`http://localhost:8700/updatecity`, { newcity })
+                .then(res => {
+                    setCitystatus(false)
+                    toast(res.data)
+                })
+                .catch(er => console.log(er))
         }
     }
 
@@ -139,8 +158,15 @@ export const MyProfile = () => {
 
                                     }
 
-
-                                    <td>{luser.city}</td>
+                                    {
+                                        !citystatus ?
+                                            <td>{luser.city}<button onClick={citystatusupdater}>✏️</button></td>
+                                            :
+                                            <>
+                                                <input type="text" value={newcity} onChange={e => setNewcity(e.target.value)} />
+                                                <button onClick={UpdateCity}>Update City</button>
+                                            </>
+                                    }
 
                                     <td><button onClick={() => followingusers()} style={{ backgroundColor: "darkgreen", color: "wheat", fontSize: "medium", borderRadius: "10px", padding: "5px" }}>{followings.length} users</button></td>
 
@@ -174,9 +200,9 @@ export const MyProfile = () => {
                                     </div>
                                     {
                                         user.FollowedBy == localStorage.getItem('Id') ?
-                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "6%", marginRight: "3%" }}>Unfollow</button>
+                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "6%", marginRight: "3%", borderRadius: "15px" }}>Unfollow</button>
                                             :
-                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "5%" }}>Follow</button>
+                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "5%", borderRadius: "15px" }}>Follow</button>
                                     }
 
                                 </div>
@@ -210,9 +236,9 @@ export const MyProfile = () => {
 
                                     {
                                         followings.find((followinguser) => followinguser.UserId == user.UserId) ?
-                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "6%", marginRight: "3%" }}>Unfollow</button>
+                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "6%", marginRight: "3%", borderRadius: "15px" }}>Unfollow</button>
                                             :
-                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "6%", marginRight: "3%" }}>Follow</button>
+                                            <button onClick={() => FollowUnfollow(user.UserId)} style={{ backgroundColor: "darkred", color: "wheat", height: "50%", marginTop: "6%", marginRight: "3%", borderRadius: "15px" }}>Follow</button>
                                     }
 
                                 </div>
