@@ -2,11 +2,16 @@ import axios from "axios"
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
+import { Navbarr } from "../Components/Navbarr"
 
 export const Home = () => {
     const [posts, setPosts] = useState([])
+    const [likes, setLikes] = useState([])
+    const [likesstatus, setLikesstatus] = useState(false)
+    const [targetpostlikes, setTargetpostlikes] = useState([])
     const nav = useNavigate()
     const [pid, setPid] = useState(null)
+    const [likedpostid, setLikedpostid] = useState(null)
     const [cid, setCid] = useState(null)
     const [showcomments, setShowcomments] = useState(false)
     const [status, setStatus] = useState(false)
@@ -15,7 +20,11 @@ export const Home = () => {
     const [updatedcomment, setUpdatedcomment] = useState("")
     const refelem = useRef("")
     const [editstatus, setEditstatus] = useState(false)
-
+    const [vstatus, setVstatus] = useState(false)
+    const [luser, setLuser] = useState(null)
+    const [fbody, setFbody] = useState("Follow")
+    const [followings, setFollowings] = useState([])
+    const [followers, setFollowers] = useState([])
     axios.defaults.withCredentials = true
 
     const tokenCHecker = () => {
@@ -28,7 +37,16 @@ export const Home = () => {
 
                 else {
                     setPosts(res.data.Posts)
+                    setLikes(res.data.Likes)
+                    setLuser(localStorage.getItem("Id"))
+                    axios.get(`http://localhost:8700/myprofile`)
+                        .then(res => {
+                            setFollowings(res.data.Followings)
+                            setFollowers(res.data.Followers)
+                        })
+                        .catch(er => console.log(er))
                     console.log(res.data.Posts);
+                    // localStorage.setItem('fs', `Follow`)
                 }
 
             })
@@ -37,20 +55,10 @@ export const Home = () => {
 
     useEffect(() => {
         tokenCHecker()
-    }, [cmnt, posts, showcomments, editstatus, status])
+    }, [cmnt, posts, showcomments, editstatus, status, likes, targetpostlikes])
 
+    
 
-
-    const Logout = async () => {
-        try {
-            const res = await axios.get(`http://localhost:8700/logout`)
-            toast(res.data)
-            nav('/')
-
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
     const ViewComments = async (postId, statuss) => {
 
@@ -64,12 +72,14 @@ export const Home = () => {
                 setShowcomments(statuss)
                 setStatus(!status)
                 setCmnt(res.data)
+                setLikesstatus(false)
 
                 console.log(res.data);
             }
 
             else {
 
+                setLikesstatus(false)
                 toast("No comments yet")
                 setPid(null)
                 setShowcomments(false)
@@ -155,15 +165,65 @@ export const Home = () => {
 
     }
 
+    const likePost = (postid) => {
+        axios.post(`http://localhost:8700/likepost/${postid}`)
+            .then(res => {
+                toast(res.data.Msg)
+                ViewLikes(postid, true)
+            })
+            .catch(er => console.log(er))
+    }
+
+
+    const ViewLikes = async (postid, vstatuss) => {
+        try {
+            const res = await axios.get(`http://localhost:8700/viewlikes/${postid}`)
+
+            if (typeof (res.data) != "string") {
+                setLikedpostid(postid)
+                setVstatus(!vstatuss)
+                setLikesstatus(!vstatuss)
+                setTargetpostlikes(res.data)
+                setShowcomments(false)
+            }
+
+            else {
+                setVstatus(!vstatuss)
+                setLikesstatus(false)
+                setTargetpostlikes([])
+                setShowcomments(false)
+                setLikedpostid(null)
+                toast(res.data)
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    const FollowUnfollow = async (userid) => {
+        try {
+            const res = await axios.post(`http://localhost:8700/followunfollowuser/${userid}`)
+            toast(res.data.Msg)
+            setFbody(res.data.Status)
+            localStorage.setItem('fs', res.data.Status)
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
+
         <div className="all" style={{ minHeight: "200%", height: "auto", backgroundColor: "black" }}>
 
-            <button onClick={Logout}>Log Out</button>
+            <Navbarr />
 
             <br />
             <br />
 
-            <div className="display" style={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", alignItems: "center" }}>
+            <div className="display" style={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", alignItems: "center", marginTop:"8%" }}>
 
                 {
                     posts.map((post) => (
@@ -203,9 +263,19 @@ export const Home = () => {
 
                             <div className="btns" style={{ marginBottom: "5%", marginTop: "5%", display: "flex", justifyContent: "space-between", width: "50%" }}>
 
-                                <button style={{ background: "darkgreen", color: "wheat", borderRadius: "20px" }} ref={refelem} onClick={() => ViewComments(post.id, !status)}>View Comments</button>
+                                <button style={{ background: "darkgreen", color: "wheat", borderRadius: "20px", fontSize: "medium" }} ref={refelem} onClick={() => ViewComments(post.id, !status)}>View Comments</button>
 
-                                <button style={{ background: "darkgreen", color: "wheat", borderRadius: "20px" }}>View Likes</button>
+                                {
+                                    likes.find((v) => v.userId == localStorage.getItem('Id') && v.postId == post.id) ?
+
+                                        <button onClick={() => likePost(post.id)} style={{ background: "darkgreen", color: "wheat", borderRadius: "20px", fontSize: "medium" }} ref={refelem} >❤️ ({likes.filter((v) => v.postId == post.id).length})</button>
+                                        :
+                                        <button onClick={() => likePost(post.id)} style={{ background: "darkgreen", color: "wheat", borderRadius: "20px", fontSize: "medium" }} ref={refelem} >🩶 ({likes.filter((v) => v.postId == post.id).length})</button>
+
+                                }
+
+
+                                <button onClick={() => ViewLikes(post.id, vstatus)} style={{ background: "darkgreen", color: "wheat", borderRadius: "20px", fontSize: "medium" }}>View Likes</button>
 
                             </div>
 
@@ -226,18 +296,18 @@ export const Home = () => {
 
                                                         <img src={comt.ProfilePic} alt="" style={{ width: "10%", height: "70%", borderRadius: "60%" }} />
 
-                                                        <input type="text" name="" id="" value={updatedcomment} onChange={e => setUpdatedcomment(e.target.value)} style={{ height: "50%", color: "wheat", background: "darkred" }} />
+                                                        <input type="text" name="" id="" value={updatedcomment} onChange={e => setUpdatedcomment(e.target.value)} style={{ height: "80%", color: "wheat", background: "black", textAlign: "center", fontSize: "medium" }} />
 
-                                                        <button onClick={() => UpdateComment([comt.CommentId, post.id, comt.comment])} style={{ height: "65%", backgroundColor: "darkgreen", color: "wheat" }}>Update</button>
+                                                        <button onClick={() => UpdateComment([comt.CommentId, post.id, comt.comment])} style={{ height: "100%", backgroundColor: "darkgreen", color: "wheat" }}>Update</button>
 
 
                                                     </div>
                                                     :
                                                     <>
-                                                        <div className="imgamnt" style={{ display: "flex" }}>
+                                                        <div className="imgamnt" style={{ display: "flex", alignItems: "center" }}>
 
-                                                            <img src={comt.ProfilePic} alt="" style={{ width: "12%", height: "75%", borderRadius: "60%" }} />
-                                                            {comt.comment}
+                                                            <img src={comt.ProfilePic} alt="" style={{ width: "12%", height: "75%", borderRadius: "60%", marginRight: "5%" }} />
+                                                            <p>{comt.comment}</p>
                                                         </div>
 
                                                         {
@@ -263,6 +333,43 @@ export const Home = () => {
                                     ))
                                     :
                                     <></>
+                                }
+
+                            </div>
+
+                            <div className="viewlikes" style={{ minWidth: "75%" }}>
+                                {
+                                    likesstatus && likedpostid == post.id ?
+                                        targetpostlikes.map((v) => (
+
+                                            <div className="likedusers" style={{ display: "flex", justifyContent: "space-between", border: "1px solid wheat", backgroundColor: "brown", width: "100%", alignItems: "center" }}>
+
+                                                <div className="imgandcmnt" style={{ display: "flex" }}>
+
+                                                    <img src={v.ProfilePic} alt="" style={{ width: "11%", height: "75%", borderRadius: "60%", marginLeft: "5%" }} />
+                                                    <p style={{ marginLeft: "3%" }}>{v.name}</p>
+
+                                                </div>
+
+                                                <div className="btn" style={{ display: "flex", alignItems: "center" }}>
+
+                                                    {
+                                                        (v.userId == localStorage.getItem('Id')) ?
+                                                            <p style={{ marginTop: "3.5%", marginRight: "13%" }}>It's You</p>
+                                                            :
+                                                            followings.find(f => f.UserId == v.userId) || followings.find(fvv => fvv.UserId == v.followinguserid) && v.followeruserid == localStorage.getItem('Id') ?
+
+                                                                <button onClick={() => FollowUnfollow(v.userId)} style={{ height: "65%", backgroundColor: "darkred", color: "wheat", marginRight: "40%" }}>UnFollow</button>
+                                                                :
+                                                                <button onClick={() => FollowUnfollow(v.userId)} style={{ height: "55%", backgroundColor: "darkgreen", color: "wheat", marginRight: "40%" }}>Follow</button>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        ))
+                                        :
+                                        <></>
+
                                 }
 
                             </div>

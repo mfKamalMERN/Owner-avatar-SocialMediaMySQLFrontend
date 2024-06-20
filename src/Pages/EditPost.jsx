@@ -2,6 +2,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "react-toastify"
+import { Navbarr } from "../Components/Navbarr"
 
 export const EditPost = () => {
     const { postid } = useParams()
@@ -49,7 +50,8 @@ export const EditPost = () => {
             try {
                 const res = await axios.put(`http://localhost:8700/editpost/${postid}`, formdata)
                 toast(res.data)
-                nav('/home')
+                console.log(res.data)
+                // nav('/home')
             } catch (error) {
                 console.log(error);
             }
@@ -58,20 +60,24 @@ export const EditPost = () => {
     }
 
     return (
-        <>
+        <div className="all" style={{ minHeight: "150vh", height: "auto", backgroundColor: "black", color: "wheat" }}>
+            <Navbarr />
+            <br />
+            <br />
+
             <form action="" onSubmit={UpdatePost}>
 
                 <label htmlFor="desc">Post Description</label>
                 <br />
-                <input id="desc" type="text" value={postdescription} onChange={e => setPostdescription(e.target.value)} />
+                <input id="desc" type="text" value={postdescription} onChange={e => setPostdescription(e.target.value)} style={{ backgroundColor: "brown", color: "wheat", width: "20%", borderRadius:"10px", textAlign:"center", fontSize:"medium", height:"3.5vh" }} />
                 <br />
                 <br />
-                <input type="file" onChange={e => setFile(e.target.files[0])} />
+                <input type="file" onChange={e => setFile(e.target.files[0])} style={{backgroundColor:"darkblue"}} />
                 <br />
                 <br />
-                <button type="submit">Update Post</button>
+                <button type="submit" style={{backgroundColor:"darkgreen", color:"wheat", borderRadius:"10px", width:"8%"}}>Update Post</button>
 
             </form>
-        </>
+        </div>
     )
 }

@@ -39,7 +39,7 @@ const Login = () => {
                     if (res.data.LoggedIn) {
                         localStorage.setItem('LoggedInUser', JSON.stringify(res.data.LoggedUser))
 
-                        localStorage.setItem('Id', JSON.stringify(res.data.LoggedUser[0].id))
+                        localStorage.setItem('Id', res.data.LoggedUser[0].id)
 
                         nav('/home')
                     }
